@@ -5,115 +5,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF Forge Pro | Image to PDF</title>
     <style>
-        /* 🎨 THEME VARIABLES */
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --text: #f8fafc;
-            --primary: #38bdf8;
-            --accent: #03dac6;
-            --border: #334155;
+            --bg: #0f172a; --card: #1e293b; --text: #f8fafc;
+            --primary: #38bdf8; --accent: #03dac6; --border: #334155;
         }
 
         body { 
-            background: var(--bg); 
-            color: var(--text); 
+            background: var(--bg); color: var(--text); 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; 
         }
 
         .container { 
-            background: var(--card); 
-            padding: 2.5rem; 
-            border-radius: 1.5rem; 
-            width: 100%; 
-            max-width: 500px; 
-            border: 1px solid var(--border);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            text-align: center;
+            background: var(--card); padding: 2.5rem; border-radius: 1.5rem; 
+            width: 100%; max-width: 500px; border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center;
+            position: relative; overflow: hidden;
         }
 
         h1 { color: var(--primary); margin-bottom: 0.5rem; font-size: 2rem; }
         p { opacity: 0.7; margin-bottom: 2rem; }
 
-        /* 📁 DRAG & DROP AREA */
-        .drop-zone {
-            border: 2px dashed var(--primary);
-            padding: 40px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            background: rgba(15, 23, 42, 0.5);
-        }
-
-        .drop-zone:hover { background: rgba(56, 189, 248, 0.1); border-color: var(--accent); }
-        .drop-zone.dragover { background: var(--primary); color: #0f172a; border-style: solid; }
-        .drop-zone span { font-weight: 500; }
-
-        /* ⚙️ SETTINGS SECTION */
-        .settings {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            text-align: left;
-            margin-bottom: 20px;
-        }
-
+        .settings { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; margin-bottom: 20px; }
         .field-full { grid-column: span 2; }
-
-        label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; color: var(--primary); }
-
-        input[type="text"], input[type="password"], select {
-            width: 100%; 
-            padding: 12px; 
-            border-radius: 8px; 
-            background: #0f172a; 
-            border: 1px solid var(--border); 
-            color: white; 
-            box-sizing: border-box;
-            outline: none;
-        }
-
+        label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--primary); display: block; margin-bottom: 8px;}
+        input, select { width: 100%; padding: 12px; border-radius: 8px; background: #0f172a; border: 1px solid var(--border); color: white; box-sizing: border-box; outline: none; }
         input:focus, select:focus { border-color: var(--primary); }
 
-        /* 🚀 ACTION BUTTON */
-        button { 
-            background: var(--primary); 
-            color: #0f172a; 
-            border: none; 
-            padding: 15px; 
-            border-radius: 8px; 
-            width: 100%; 
-            font-weight: 800; 
-            font-size: 1rem;
-            cursor: pointer; 
-            transition: transform 0.2s, filter 0.2s;
-            margin-top: 10px;
+        /* DRAG AND DROP */
+        .drop-zone {
+            border: 2px dashed var(--primary); padding: 30px 20px; border-radius: 12px;
+            margin-bottom: 20px; transition: all 0.3s ease; cursor: pointer; background: rgba(15, 23, 42, 0.5);
         }
+        .drop-zone:hover { background: rgba(56, 189, 248, 0.1); border-color: var(--accent); }
+        .drop-zone.dragover { background: var(--primary); color: #0f172a; border-style: solid; }
+        
+        /* IMAGE PREVIEWS */
+        .preview-grid {
+            display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px;
+            max-height: 150px; overflow-y: auto; padding-bottom: 10px;
+        }
+        .preview-grid img {
+            width: 60px; height: 60px; object-fit: cover; border-radius: 8px;
+            border: 2px solid var(--border); transition: 0.3s;
+        }
+        .preview-grid img:hover { transform: scale(1.1); border-color: var(--primary); }
 
+        button { 
+            background: var(--primary); color: #0f172a; border: none; padding: 15px; 
+            border-radius: 8px; width: 100%; font-weight: 800; font-size: 1rem; cursor: pointer; 
+            transition: 0.2s; margin-top: 10px;
+        }
         button:hover { filter: brightness(1.1); transform: translateY(-2px); }
-        button:active { transform: translateY(0); }
+
+        /* 🚀 LOADING SCREEN OVERLAY */
+        #loading-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(30, 41, 59, 0.95); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 10; opacity: 0;
+            pointer-events: none; transition: opacity 0.3s; border-radius: 1.5rem;
+        }
+        #loading-overlay.active { opacity: 1; pointer-events: all; }
+        
+        .spinner {
+            border: 5px solid rgba(255,255,255,0.1); border-left-color: var(--primary);
+            border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <div id="loading-overlay">
+            <div class="spinner"></div>
+            <h2 id="loading-text" style="color: var(--primary);">Converting Files...</h2>
+            <p>Please wait while we forge your PDF.</p>
+        </div>
+
         <h1>🛠️ PDF Forge</h1>
         <p>Convert and Secure your Images</p>
         
-        <form action="/convert" method="post" enctype="multipart/form-data">
-            
+        <form id="pdf-form">
             <div class="settings">
                 <div class="field-full">
                     <label>Document Name</label>
-                    <input type="text" name="pdf_name" placeholder="e.g. Portfolio_Final">
+                    <input type="text" name="pdf_name" id="pdf_name" placeholder="e.g. Portfolio_Final">
                 </div>
-
                 <div>
                     <label>Page Size</label>
                     <select name="page_size">
@@ -122,7 +101,6 @@
                         <option value="A3">A3 (Large)</option>
                     </select>
                 </div>
-
                 <div>
                     <label>Password (Optional)</label>
                     <input type="password" name="pdf_password" placeholder="Keep it secret">
@@ -130,8 +108,10 @@
             </div>
 
             <div class="drop-zone" id="drop-zone">
-                <span id="drop-text">📂 Click or Drag & Drop Images</span>
-                <input type="file" name="files" id="file-input" multiple required style="display: none;">
+                <span id="drop-text" style="font-weight:bold;">📂 Click or Drag & Drop Images</span>
+                <input type="file" name="files" id="file-input" multiple accept="image/*" style="display: none;">
+                
+                <div id="preview-container" class="preview-grid"></div>
             </div>
             
             <button type="submit">🔥 FORGE PDF</button>
@@ -140,54 +120,113 @@
 
     <script>
         const dropZone = document.getElementById('drop-zone');
-const fileInput = document.getElementById('file-input');
-const previewContainer = document.getElementById('preview-container'); // Add this ID in HTML!
+        const fileInput = document.getElementById('file-input');
+        const dropText = document.getElementById('drop-text');
+        const previewContainer = document.getElementById('preview-container');
+        const form = document.getElementById('pdf-form');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingText = document.getElementById('loading-text');
 
-// 1. Open file dialog on click
-dropZone.onclick = () => fileInput.click();
+        // We will store our selected files in this array so it's bulletproof
+        let currentFiles = [];
 
-// 2. Prevent browser from just opening the image file
-['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    dropZone.addEventListener(eventName, e => e.preventDefault());
-});
-
-// 3. Highlight on drag
-dropZone.ondragover = () => dropZone.classList.add('dragover');
-dropZone.ondragleave = () => dropZone.classList.remove('dragover');
-
-// 4. THE FIX: Handle dropped files
-dropZone.ondrop = (e) => {
-    dropZone.classList.remove('dragover');
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-        fileInput.files = files; // This works in most modern browsers now
-        handleFiles(files);
-    }
-};
-
-fileInput.onchange = () => handleFiles(fileInput.files);
-
-function handleFiles(files) {
-    previewContainer.innerHTML = ''; // Clear old previews
-    
-    Array.from(files).forEach(file => {
-        if (!file.type.startsWith('image/')) return; // Skip non-images
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.style.width = '80px';
-            img.style.height = '80px';
-            img.style.objectFit = 'cover';
-            img.style.borderRadius = '5px';
-            img.style.margin = '5px';
-            img.style.border = '2px solid var(--primary)';
-            previewContainer.appendChild(img);
+        // 1. Click to open file dialog
+        dropZone.onclick = (e) => {
+            // Prevent clicking previews from triggering file upload again
+            if(e.target.tagName !== 'IMG') fileInput.click();
         };
-        reader.readAsDataURL(file);
-    });
-}
+
+        // 2. Drag & Drop Visuals
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+
+        dropZone.ondragover = () => dropZone.classList.add('dragover');
+        dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+
+        // 3. Handle Dropped Files OR Selected Files
+        dropZone.ondrop = (e) => {
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        };
+        
+        fileInput.onchange = (e) => handleFiles(e.target.files);
+
+        // 4. The Magic: Show Previews & Count
+        function handleFiles(files) {
+            if (files.length === 0) return;
+            
+            // Convert to array and filter out non-images
+            currentFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+            
+            dropText.innerText = `✅ ${currentFiles.length} images ready to convert!`;
+            previewContainer.innerHTML = ''; // Clear old previews
+
+            currentFiles.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.title = file.name;
+                    previewContainer.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 5. Submit Form with Loading Screen (AJAX/Fetch)
+        form.onsubmit = async (e) => {
+            e.preventDefault(); // Stop normal submission
+            
+            if (currentFiles.length === 0) {
+                alert("Please select at least one image!");
+                return;
+            }
+
+            // SHOW LOADING SCREEN
+            loadingText.innerText = `Forging ${currentFiles.length} files...`;
+            loadingOverlay.classList.add('active');
+
+            // Pack the data to send to Python
+            const formData = new FormData(form);
+            formData.delete('files'); // Remove the hidden input files
+            currentFiles.forEach(file => formData.append('files', file)); // Add our verified files
+
+            try {
+                // Send to your Python backend
+                const response = await fetch('/convert', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    // Receive the PDF and trigger download
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    
+                    // Use the custom name if provided, else default
+                    let customName = document.getElementById('pdf_name').value;
+                    a.download = customName ? `${customName}.pdf` : 'My_Forged_Document.pdf';
+                    
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                } else {
+                    alert("Server error! Check your Python terminal.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Something went wrong uploading the files.");
+            } finally {
+                // HIDE LOADING SCREEN
+                loadingOverlay.classList.remove('active');
+            }
+        };
     </script>
 
 </body>

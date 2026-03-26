@@ -5,6 +5,7 @@ import threading
 import time
 from flask import Flask, render_template, request, send_file
 import img2pdf
+from PIL import Image
 
 
 app = Flask(__name__)
@@ -46,9 +47,20 @@ def convert():
     
     file_paths = []
     for file in uploaded_files:
-        path = os.path.join(UPLOAD_FOLDER, file.filename)
-        file.save(path)
-        file_paths.append(path)
+        original_path = os.path.join(user_session_folder, file.filename)
+        file.save(original_path)
+
+        clean_name = file.filename.rsplit('.', 1)[0] + "_fixed.jpg"
+        fixed_path = os.path.join(user_session_folder, clean_name)
+
+        try:
+            with Image.open(original_path) as img:
+                rgb_img = img.convert('RGB')
+                rgb_img.save(fixed_path, "JPEG", quality=95)
+                file_paths.append(fixed_path)
+        except Exception as e:
+            print(f"Error Processing {file.filename}: {e}")
+            continue
 
     output_pdf_path = os.path.join(user_session_folder, f"{custom_name}.pdf")
 
