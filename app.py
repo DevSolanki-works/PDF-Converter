@@ -4,10 +4,6 @@ import img2pdf
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
 
 @app.route('/')
 def index():
@@ -15,23 +11,30 @@ def index():
 
 @app.route('/convert', methods=['POST'])
 def convert():
-    if 'file' not in request.files:
-        return "No file part"
-    
-    file = request.files['file']
-    if file.filename == '':
-        return "No selected File"
-    
-    img_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-    file.save(img_path)
+    uploaded_files = request.files.getlist("files")
 
-    pdf_path = img_path.rsplit('.', 1)[0] + ".pdf"
-
-    with open(pdf_path, "wb") as f:
-        f.write(img2pdf.convert(img_path))
+    if not uploaded_files or uploaded_files[0].filename == '':
+        return "No Files Selected"
     
-    return send_file(pdf_path, as_attachment=True)
+    file_paths = []
+
+    for file in uploaded_files:
+        path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(path)
+        file_paths.append(path)
+
+    output_pdf = os.path.join(UPLOAD_FOLDER, "merged_document.pdf")
+
+    with open(output_pdf, "wb") as f:
+        f.write(img2pdf.convert(file_paths))
+    
+    for path in file_paths:
+        os.remove(path)
+    
+    return send_file(output_pdf, as_attachment=True)
 
 if __name__ == '__main__':
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)
     app.run(debug=True)
 
