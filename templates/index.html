@@ -140,34 +140,54 @@
 
     <script>
         const dropZone = document.getElementById('drop-zone');
-        const fileInput = document.getElementById('file-input');
-        const dropText = document.getElementById('drop-text');
+const fileInput = document.getElementById('file-input');
+const previewContainer = document.getElementById('preview-container'); // Add this ID in HTML!
 
-        // Open file dialog when clicking the zone
-        dropZone.onclick = () => fileInput.click();
+// 1. Open file dialog on click
+dropZone.onclick = () => fileInput.click();
 
-        // Visual feedback for dragging
-        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('dragover'); };
-        dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+// 2. Prevent browser from just opening the image file
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, e => e.preventDefault());
+});
 
-        // Handle the dropped files
-        dropZone.ondrop = (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            
-            if (e.dataTransfer.files.length > 0) {
-                fileInput.files = e.dataTransfer.files;
-                updateFileCount();
-            }
+// 3. Highlight on drag
+dropZone.ondragover = () => dropZone.classList.add('dragover');
+dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+
+// 4. THE FIX: Handle dropped files
+dropZone.ondrop = (e) => {
+    dropZone.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        fileInput.files = files; // This works in most modern browsers now
+        handleFiles(files);
+    }
+};
+
+fileInput.onchange = () => handleFiles(fileInput.files);
+
+function handleFiles(files) {
+    previewContainer.innerHTML = ''; // Clear old previews
+    
+    Array.from(files).forEach(file => {
+        if (!file.type.startsWith('image/')) return; // Skip non-images
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.style.width = '80px';
+            img.style.height = '80px';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '5px';
+            img.style.margin = '5px';
+            img.style.border = '2px solid var(--primary)';
+            previewContainer.appendChild(img);
         };
-
-        // Update text when files are selected via dialog
-        fileInput.onchange = () => updateFileCount();
-
-        function updateFileCount() {
-            const count = fileInput.files.length;
-            dropText.innerText = count > 0 ? `✅ ${count} images selected` : "📂 Click or Drag & Drop Images";
-        }
+        reader.readAsDataURL(file);
+    });
+}
     </script>
 
 </body>
