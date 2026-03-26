@@ -11,4 +11,3 @@ def image_to_pdf(output_filename, image_list):
 if __name__ == "__main__":
     test_images = ["test.jpg"]
     image_to_pdf("my_result.pdf", test_images)
-    
