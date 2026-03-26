@@ -10,6 +10,9 @@ from PIL import Image
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
+if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)
+
 
 #Background Cleaning
 def cleanup_worker():
@@ -79,6 +82,4 @@ def convert():
     return send_file(output_pdf_path, as_attachment=True, download_name=f"{custom_name}.pdf")
 
 if __name__ == '__main__':
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
     app.run(debug=True)
