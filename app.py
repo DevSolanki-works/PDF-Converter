@@ -6,6 +6,7 @@ import time
 from flask import Flask, render_template, request, send_file
 import img2pdf
 
+
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 
@@ -51,7 +52,14 @@ def convert():
 
     output_pdf_path = os.path.join(user_session_folder, f"{custom_name}.pdf")
 
-    layout_fun = img2pdf.get_layout_fun(pagesize=getattr(img2pdf, page_size.upper()))
+    sizes = {
+        "A4": (img2pdf.mm_to_pt(210), img2pdf.mm_to_pt(297)),
+        "LETTER": (img2pdf.mm_to_pt(216), img2pdf.mm_to_pt(279)),
+        "A3": (img2pdf.mm_to_pt(297), img2pdf.mm_to_pt(420))
+    }
+
+    selected_size = sizes.get(page_size.upper(), sizes["A4"])
+    layout_fun = img2pdf.get_layout_fun(pagesize=selected_size)
 
     with open(output_pdf_path, "wb") as f:
         f.write(img2pdf.convert(file_paths, layout_fun=layout_fun))
@@ -62,4 +70,3 @@ if __name__ == '__main__':
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
     app.run(debug=True)
-

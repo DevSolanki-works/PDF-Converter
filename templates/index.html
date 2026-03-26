@@ -2,52 +2,173 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PDF Forge Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Forge Pro | Image to PDF</title>
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --primary: #38bdf8; }
-        body { background: var(--bg); color: var(--text); font-family: system-ui; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: var(--card); padding: 2rem; border-radius: 1rem; width: 100%; max-width: 450px; border: 1px solid #334155; }
-        h1 { color: var(--primary); margin-bottom: 0.5rem; }
-        .setting-group { display: flex; gap: 10px; margin-bottom: 15px; text-align: left; }
-        .field { flex: 1; }
-        label { font-size: 0.8rem; opacity: 0.8; display: block; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 10px; border-radius: 6px; background: #0f172a; border: 1px solid #475569; color: white; box-sizing: border-box; }
-        button { background: var(--primary); color: #0f172a; border: none; padding: 12px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        button:hover { filter: brightness(1.2); }
+        /* 🎨 THEME VARIABLES */
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --primary: #38bdf8;
+            --accent: #03dac6;
+            --border: #334155;
+        }
+
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+        }
+
+        .container { 
+            background: var(--card); 
+            padding: 2.5rem; 
+            border-radius: 1.5rem; 
+            width: 100%; 
+            max-width: 500px; 
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        h1 { color: var(--primary); margin-bottom: 0.5rem; font-size: 2rem; }
+        p { opacity: 0.7; margin-bottom: 2rem; }
+
+        /* 📁 DRAG & DROP AREA */
+        .drop-zone {
+            border: 2px dashed var(--primary);
+            padding: 40px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .drop-zone:hover { background: rgba(56, 189, 248, 0.1); border-color: var(--accent); }
+        .drop-zone.dragover { background: var(--primary); color: #0f172a; border-style: solid; }
+        .drop-zone span { font-weight: 500; }
+
+        /* ⚙️ SETTINGS SECTION */
+        .settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .field-full { grid-column: span 2; }
+
+        label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; color: var(--primary); }
+
+        input[type="text"], input[type="password"], select {
+            width: 100%; 
+            padding: 12px; 
+            border-radius: 8px; 
+            background: #0f172a; 
+            border: 1px solid var(--border); 
+            color: white; 
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus, select:focus { border-color: var(--primary); }
+
+        /* 🚀 ACTION BUTTON */
+        button { 
+            background: var(--primary); 
+            color: #0f172a; 
+            border: none; 
+            padding: 15px; 
+            border-radius: 8px; 
+            width: 100%; 
+            font-weight: 800; 
+            font-size: 1rem;
+            cursor: pointer; 
+            transition: transform 0.2s, filter 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>🛠️ PDF Forge Pro</h1>
-        <p>Advanced Image-to-PDF Conversion</p>
+        <h1>🛠️ PDF Forge</h1>
+        <p>Convert and Secure your Images</p>
         
         <form action="/convert" method="post" enctype="multipart/form-data">
-            <label>Project Name</label>
-            <input type="text" name="pdf_name" placeholder="My_Document">
+            
+            <div class="settings">
+                <div class="field-full">
+                    <label>Document Name</label>
+                    <input type="text" name="pdf_name" placeholder="e.g. Portfolio_Final">
+                </div>
 
-            <div class="setting-group">
-                <div class="field">
-                    <label>Paper Size</label>
+                <div>
+                    <label>Page Size</label>
                     <select name="page_size">
                         <option value="A4">A4 (Standard)</option>
                         <option value="Letter">Letter (US)</option>
                         <option value="A3">A3 (Large)</option>
                     </select>
                 </div>
-                <div class="field">
-                    <label>Orientation</label>
-                    <select name="orientation">
-                        <option value="portrait">Portrait</option>
-                        <option value="landscape">Landscape</option>
-                    </select>
+
+                <div>
+                    <label>Password (Optional)</label>
+                    <input type="password" name="pdf_password" placeholder="Keep it secret">
                 </div>
             </div>
 
-            <label>Upload Images (JPG/PNG)</label>
-            <input type="file" name="files" multiple required>
+            <div class="drop-zone" id="drop-zone">
+                <span id="drop-text">📂 Click or Drag & Drop Images</span>
+                <input type="file" name="files" id="file-input" multiple required style="display: none;">
+            </div>
             
-            <button type="submit">Generate PDF</button>
+            <button type="submit">🔥 FORGE PDF</button>
         </form>
     </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const dropText = document.getElementById('drop-text');
+
+        // Open file dialog when clicking the zone
+        dropZone.onclick = () => fileInput.click();
+
+        // Visual feedback for dragging
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('dragover'); };
+        dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+
+        // Handle the dropped files
+        dropZone.ondrop = (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                updateFileCount();
+            }
+        };
+
+        // Update text when files are selected via dialog
+        fileInput.onchange = () => updateFileCount();
+
+        function updateFileCount() {
+            const count = fileInput.files.length;
+            dropText.innerText = count > 0 ? `✅ ${count} images selected` : "📂 Click or Drag & Drop Images";
+        }
+    </script>
+
 </body>
 </html>
