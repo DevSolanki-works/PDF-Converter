@@ -1,10 +1,28 @@
 import os
 import uuid
+import shutil
+import threading
+import time
 from flask import Flask, render_template, request, send_file
 import img2pdf
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
+
+#Background Cleaning
+def cleanup_worker():
+    while True:
+        time.sleep(600)
+        now = time.time()
+        if os.path.exists(UPLOAD_FOLDER):
+            for folder in os.listdir(UPLOAD_FOLDER):
+                folder_path = os.path.join(UPLOAD_FOLDER, folder)
+                
+                if os.path.getmtime(folder_path) < now - 900:
+                    shutil.rmtree(folder_path)
+                    print(f"🧹 Cleaned up old session: {folder}")
+
+threading.Thread(target=cleanup_worker, daemon=True).start()
 
 @app.route('/')
 def index():
@@ -13,8 +31,10 @@ def index():
 @app.route('/convert', methods=['POST'])
 def convert():
     uploaded_files = request.files.getlist("files")
-
     custom_name = request.form.get("pdf_name") or "my_pdf"
+
+    page_size = request.form.get("page_size", "A4")
+    orientation = request.form.get("orientation", "potrait")
 
     if not uploaded_files or uploaded_files[0].filename == '':
         return "No Files Selected"
@@ -31,11 +51,10 @@ def convert():
 
     output_pdf_path = os.path.join(user_session_folder, f"{custom_name}.pdf")
 
+    layout_fun = img2pdf.get_layout_fun(pagesize=getattr(img2pdf, page_size.upper()))
+
     with open(output_pdf_path, "wb") as f:
-        f.write(img2pdf.convert(file_paths))
-    
-    for path in file_paths:
-        os.remove(path)
+        f.write(img2pdf.convert(file_paths, layout_fun=layout_fun))
     
     return send_file(output_pdf_path, as_attachment=True, download_name=f"{custom_name}.pdf")
 

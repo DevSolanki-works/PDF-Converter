@@ -2,59 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Pro PDF Converter</title>
+    <title>PDF Forge Pro</title>
     <style>
-        :root {
-            --bg: #121212;
-            --card: #1e1e1e;
-            --text: #e0e0e0;
-            --primary: #bb86fc;
-            --accent: #03dac6;
-        }
-
-        body { 
-            background-color: var(--bg); 
-            color: var(--text); 
-            font-family: 'Segoe UI', sans-serif;
-            display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;
-        }
-
-        .container { 
-            background: var(--card); 
-            padding: 40px; 
-            border-radius: 15px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            text-align: center; width: 400px;
-        }
-
-        input[type="text"], input[type="file"] {
-            width: 100%; padding: 10px; margin: 15px 0;
-            border-radius: 5px; border: 1px solid #333;
-            background: #2c2c2c; color: white;
-        }
-
-        button { 
-            background: var(--primary); color: #000; font-weight: bold;
-            border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer;
-            width: 100%; transition: 0.3s;
-        }
-
-        button:hover { background: var(--accent); transform: translateY(-2px); }
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --primary: #38bdf8; }
+        body { background: var(--bg); color: var(--text); font-family: system-ui; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: var(--card); padding: 2rem; border-radius: 1rem; width: 100%; max-width: 450px; border: 1px solid #334155; }
+        h1 { color: var(--primary); margin-bottom: 0.5rem; }
+        .setting-group { display: flex; gap: 10px; margin-bottom: 15px; text-align: left; }
+        .field { flex: 1; }
+        label { font-size: 0.8rem; opacity: 0.8; display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 10px; border-radius: 6px; background: #0f172a; border: 1px solid #475569; color: white; box-sizing: border-box; }
+        button { background: var(--primary); color: #0f172a; border: none; padding: 12px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { filter: brightness(1.2); }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🌌 PDF Forge</h1>
-        <p>Convert your images into a single PDF.</p>
+        <h1>🛠️ PDF Forge Pro</h1>
+        <p>Advanced Image-to-PDF Conversion</p>
         
         <form action="/convert" method="post" enctype="multipart/form-data">
-            <label>1. Name your PDF:</label>
-            <input type="text" name="pdf_name" placeholder="e.g. My_Vacation_Photos">
-            
-            <label>2. Select Images:</label>
+            <label>Project Name</label>
+            <input type="text" name="pdf_name" placeholder="My_Document">
+
+            <div class="setting-group">
+                <div class="field">
+                    <label>Paper Size</label>
+                    <select name="page_size">
+                        <option value="A4">A4 (Standard)</option>
+                        <option value="Letter">Letter (US)</option>
+                        <option value="A3">A3 (Large)</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Orientation</label>
+                    <select name="orientation">
+                        <option value="portrait">Portrait</option>
+                        <option value="landscape">Landscape</option>
+                    </select>
+                </div>
+            </div>
+
+            <label>Upload Images (JPG/PNG)</label>
             <input type="file" name="files" multiple required>
             
-            <button type="submit">Build PDF</button>
+            <button type="submit">Generate PDF</button>
         </form>
     </div>
 </body>
