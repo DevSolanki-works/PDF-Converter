@@ -6,15 +6,14 @@ import time
 from flask import Flask, render_template, request, send_file
 import img2pdf
 from PIL import Image
-
+from pypdf import PdfReader, PdfWriter
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
+
 if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
+    os.makedirs(UPLOAD_FOLDER)
 
-
-#Background Cleaning
 def cleanup_worker():
     while True:
         time.sleep(600)
@@ -25,7 +24,6 @@ def cleanup_worker():
                 
                 if os.path.getmtime(folder_path) < now - 900:
                     shutil.rmtree(folder_path)
-                    print(f"🧹 Cleaned up old session: {folder}")
 
 threading.Thread(target=cleanup_worker, daemon=True).start()
 
@@ -37,12 +35,11 @@ def index():
 def convert():
     uploaded_files = request.files.getlist("files")
     custom_name = request.form.get("pdf_name") or "my_pdf"
-
     page_size = request.form.get("page_size", "A4")
-    orientation = request.form.get("orientation", "potrait")
+    password = request.form.get("pdf_password", "").strip()
 
     if not uploaded_files or uploaded_files[0].filename == '':
-        return "No Files Selected"
+        return "No Files Selected", 400
     
     unique_id = str(uuid.uuid4())
     user_session_folder = os.path.join(UPLOAD_FOLDER, unique_id)
@@ -61,8 +58,7 @@ def convert():
                 rgb_img = img.convert('RGB')
                 rgb_img.save(fixed_path, "JPEG", quality=95)
                 file_paths.append(fixed_path)
-        except Exception as e:
-            print(f"Error Processing {file.filename}: {e}")
+        except Exception:
             continue
 
     output_pdf_path = os.path.join(user_session_folder, f"{custom_name}.pdf")
@@ -78,6 +74,21 @@ def convert():
 
     with open(output_pdf_path, "wb") as f:
         f.write(img2pdf.convert(file_paths, layout_fun=layout_fun))
+
+    if password:
+        encrypted_pdf_path = os.path.join(user_session_folder, f"locked_{custom_name}.pdf")
+        reader = PdfReader(output_pdf_path)
+        writer = PdfWriter()
+
+        for page in reader.pages:
+            writer.add_page(page)
+
+        writer.encrypt(password)
+
+        with open(encrypted_pdf_path, "wb") as f:
+            writer.write(f)
+        
+        output_pdf_path = encrypted_pdf_path
     
     return send_file(output_pdf_path, as_attachment=True, download_name=f"{custom_name}.pdf")
 
