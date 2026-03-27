@@ -117,8 +117,7 @@
             <button type="submit">🔥 FORGE PDF</button>
         </form>
     </div>
-
-    <script>
+        <script>
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const dropText = document.getElementById('drop-text');
@@ -127,12 +126,11 @@
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingText = document.getElementById('loading-text');
 
-        // We will store our selected files in this array so it's bulletproof
+        // Array to store all selected files
         let currentFiles = [];
 
         // 1. Click to open file dialog
         dropZone.onclick = (e) => {
-            // Prevent clicking previews from triggering file upload again
             if(e.target.tagName !== 'IMG') fileInput.click();
         };
 
@@ -147,23 +145,24 @@
         dropZone.ondragover = () => dropZone.classList.add('dragover');
         dropZone.ondragleave = () => dropZone.classList.remove('dragover');
 
-        // 3. Handle Dropped Files OR Selected Files
+        // 3. Handle Dropped Files
         dropZone.ondrop = (e) => {
             dropZone.classList.remove('dragover');
             handleFiles(e.dataTransfer.files);
         };
         
+        // Handle Selected Files via Button
         fileInput.onchange = (e) => handleFiles(e.target.files);
 
-        // 4. The Magic: Show Previews & Count
+        // 4. Additive logic: Append new files to the existing list
         function handleFiles(files) {
             if (files.length === 0) return;
             
-            // Convert to array and filter out non-images
-            currentFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+            const newImages = Array.from(files).filter(file => file.type.startsWith('image/'));
+            currentFiles = [...currentFiles, ...newImages];
             
             dropText.innerText = `✅ ${currentFiles.length} images ready to convert!`;
-            previewContainer.innerHTML = ''; // Clear old previews
+            previewContainer.innerHTML = ''; 
 
             currentFiles.forEach(file => {
                 const reader = new FileReader();
@@ -177,57 +176,61 @@
             });
         }
 
-        // 5. Submit Form with Loading Screen (AJAX/Fetch)
+        // 5. Submit Form with Loading Screen & Cleanup
         form.onsubmit = async (e) => {
-            e.preventDefault(); // Stop normal submission
+            e.preventDefault(); 
             
             if (currentFiles.length === 0) {
                 alert("Please select at least one image!");
                 return;
             }
 
-            // SHOW LOADING SCREEN
             loadingText.innerText = `Forging ${currentFiles.length} files...`;
             loadingOverlay.classList.add('active');
 
-            // Pack the data to send to Python
             const formData = new FormData(form);
-            formData.delete('files'); // Remove the hidden input files
-            currentFiles.forEach(file => formData.append('files', file)); // Add our verified files
+            formData.delete('files'); 
+            currentFiles.forEach(file => formData.append('files', file)); 
 
             try {
-                // Send to your Python backend
                 const response = await fetch('/convert', {
                     method: 'POST',
                     body: formData
                 });
 
                 if (response.ok) {
-                    // Receive the PDF and trigger download
                     const blob = await response.blob();
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
+
+                    a.style.display = 'none';
                     a.href = url;
                     
-                    // Use the custom name if provided, else default
                     let customName = document.getElementById('pdf_name').value;
                     a.download = customName ? `${customName}.pdf` : 'My_Forged_Document.pdf';
                     
                     document.body.appendChild(a);
                     a.click();
-                    a.remove();
+
+                    // Cleanup to remove the "blob" notification/link
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+
+                    // Reset UI
+                    form.reset();
+                    currentFiles = [];
+                    previewContainer.innerHTML = '';
+                    dropText.innerText = "📂 Click or Drag & Drop Images";
                 } else {
-                    alert("Server error! Check your Python terminal.");
+                    alert("Server error. Check your Render logs!");
                 }
             } catch (error) {
-                console.error("Error:", error);
-                alert("Something went wrong uploading the files.");
+                console.error("Fetch Error:", error);
+                alert("Connection error. Is the server live?");
             } finally {
-                // HIDE LOADING SCREEN
                 loadingOverlay.classList.remove('active');
             }
         };
     </script>
-
 </body>
 </html>
