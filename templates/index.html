@@ -6,8 +6,12 @@
     <title>PDF Forge Pro | Image to PDF</title>
     <style>
         :root {
-            --bg: #0f172a; --card: #1e293b; --text: #f8fafc;
-            --primary: #38bdf8; --accent: #03dac6; --border: #334155;
+            --bg: #1a1016;
+            --card: #271722;
+            --text: #fce7f3;
+            --primary: #f472b6;
+            --accent: #ec4899;
+            --border: #502b3e;
         }
 
         body { 
@@ -20,28 +24,26 @@
         .container { 
             background: var(--card); padding: 2.5rem; border-radius: 1.5rem; 
             width: 100%; max-width: 500px; border: 1px solid var(--border);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center;
+            box-shadow: 0 20px 50px rgba(236, 72, 153, 0.15); text-align: center;
             position: relative; overflow: hidden;
         }
 
-        h1 { color: var(--primary); margin-bottom: 0.5rem; font-size: 2rem; }
-        p { opacity: 0.7; margin-bottom: 2rem; }
+        h1 { color: var(--primary); margin-bottom: 0.5rem; font-size: 2rem; text-shadow: 0 0 10px rgba(244, 114, 182, 0.3); }
+        p { opacity: 0.8; margin-bottom: 2rem; color: #fbcfe8; }
 
         .settings { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; margin-bottom: 20px; }
         .field-full { grid-column: span 2; }
         label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--primary); display: block; margin-bottom: 8px;}
-        input, select { width: 100%; padding: 12px; border-radius: 8px; background: #0f172a; border: 1px solid var(--border); color: white; box-sizing: border-box; outline: none; }
-        input:focus, select:focus { border-color: var(--primary); }
+        input, select { width: 100%; padding: 12px; border-radius: 8px; background: #1a1016; border: 1px solid var(--border); color: white; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 8px rgba(236, 72, 153, 0.3); }
 
-        /* DRAG AND DROP */
         .drop-zone {
             border: 2px dashed var(--primary); padding: 30px 20px; border-radius: 12px;
-            margin-bottom: 20px; transition: all 0.3s ease; cursor: pointer; background: rgba(15, 23, 42, 0.5);
+            margin-bottom: 20px; transition: all 0.3s ease; cursor: pointer; background: rgba(244, 114, 182, 0.05);
         }
-        .drop-zone:hover { background: rgba(56, 189, 248, 0.1); border-color: var(--accent); }
-        .drop-zone.dragover { background: var(--primary); color: #0f172a; border-style: solid; }
+        .drop-zone:hover { background: rgba(244, 114, 182, 0.1); border-color: var(--accent); }
+        .drop-zone.dragover { background: var(--primary); color: #1a1016; border-style: solid; }
         
-        /* IMAGE PREVIEWS */
         .preview-grid {
             display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px;
             max-height: 150px; overflow-y: auto; padding-bottom: 10px;
@@ -50,26 +52,25 @@
             width: 60px; height: 60px; object-fit: cover; border-radius: 8px;
             border: 2px solid var(--border); transition: 0.3s;
         }
-        .preview-grid img:hover { transform: scale(1.1); border-color: var(--primary); }
+        .preview-grid img:hover { transform: scale(1.1); border-color: var(--primary); box-shadow: 0 0 10px rgba(244, 114, 182, 0.5); }
 
         button { 
-            background: var(--primary); color: #0f172a; border: none; padding: 15px; 
+            background: linear-gradient(135deg, var(--primary), var(--accent)); color: #1a1016; border: none; padding: 15px; 
             border-radius: 8px; width: 100%; font-weight: 800; font-size: 1rem; cursor: pointer; 
-            transition: 0.2s; margin-top: 10px;
+            transition: 0.3s; margin-top: 10px; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
         }
-        button:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        button:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4); }
 
-        /* 🚀 LOADING SCREEN OVERLAY */
         #loading-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(30, 41, 59, 0.95); display: flex; flex-direction: column;
+            background: rgba(39, 23, 34, 0.95); display: flex; flex-direction: column;
             justify-content: center; align-items: center; z-index: 10; opacity: 0;
             pointer-events: none; transition: opacity 0.3s; border-radius: 1.5rem;
         }
         #loading-overlay.active { opacity: 1; pointer-events: all; }
         
         .spinner {
-            border: 5px solid rgba(255,255,255,0.1); border-left-color: var(--primary);
+            border: 5px solid rgba(244, 114, 182, 0.1); border-left-color: var(--primary);
             border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -84,7 +85,7 @@
             <p>Please wait while we forge your PDF.</p>
         </div>
 
-        <h1>🛠️ PDF Forge</h1>
+        <h1>🌸 PDF Forge</h1>
         <p>Convert and Secure your Images</p>
         
         <form id="pdf-form">
@@ -114,10 +115,10 @@
                 <div id="preview-container" class="preview-grid"></div>
             </div>
             
-            <button type="submit">🔥 FORGE PDF</button>
+            <button type="submit">✨ FORGE PDF</button>
         </form>
     </div>
-        <script>
+    <script>
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const dropText = document.getElementById('drop-text');
@@ -126,15 +127,12 @@
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingText = document.getElementById('loading-text');
 
-        // Array to store all selected files
         let currentFiles = [];
 
-        // 1. Click to open file dialog
         dropZone.onclick = (e) => {
             if(e.target.tagName !== 'IMG') fileInput.click();
         };
 
-        // 2. Drag & Drop Visuals
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             dropZone.addEventListener(eventName, preventDefaults, false);
             document.body.addEventListener(eventName, preventDefaults, false);
@@ -145,23 +143,20 @@
         dropZone.ondragover = () => dropZone.classList.add('dragover');
         dropZone.ondragleave = () => dropZone.classList.remove('dragover');
 
-        // 3. Handle Dropped Files
         dropZone.ondrop = (e) => {
             dropZone.classList.remove('dragover');
             handleFiles(e.dataTransfer.files);
         };
         
-        // Handle Selected Files via Button
         fileInput.onchange = (e) => handleFiles(e.target.files);
 
-        // 4. Additive logic: Append new files to the existing list
         function handleFiles(files) {
             if (files.length === 0) return;
             
             const newImages = Array.from(files).filter(file => file.type.startsWith('image/'));
             currentFiles = [...currentFiles, ...newImages];
             
-            dropText.innerText = `✅ ${currentFiles.length} images ready to convert!`;
+            dropText.innerText = `🌸 ${currentFiles.length} images ready to convert!`;
             previewContainer.innerHTML = ''; 
 
             currentFiles.forEach(file => {
@@ -176,7 +171,6 @@
             });
         }
 
-        // 5. Submit Form with Loading Screen & Cleanup
         form.onsubmit = async (e) => {
             e.preventDefault(); 
             
@@ -212,11 +206,9 @@
                     document.body.appendChild(a);
                     a.click();
 
-                    // Cleanup to remove the "blob" notification/link
                     window.URL.revokeObjectURL(url);
                     document.body.removeChild(a);
 
-                    // Reset UI
                     form.reset();
                     currentFiles = [];
                     previewContainer.innerHTML = '';
@@ -225,7 +217,7 @@
                     alert("Server error. Check your Render logs!");
                 }
             } catch (error) {
-                console.error("Fetch Error:", error);
+                console.error(error);
                 alert("Connection error. Is the server live?");
             } finally {
                 loadingOverlay.classList.remove('active');
