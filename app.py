@@ -21,7 +21,6 @@ def cleanup_worker():
         if os.path.exists(UPLOAD_FOLDER):
             for folder in os.listdir(UPLOAD_FOLDER):
                 folder_path = os.path.join(UPLOAD_FOLDER, folder)
-                
                 if os.path.getmtime(folder_path) < now - 900:
                     shutil.rmtree(folder_path)
 
@@ -35,7 +34,8 @@ def index():
 def convert():
     uploaded_files = request.files.getlist("files")
     custom_name = request.form.get("pdf_name") or "my_pdf"
-    page_size = request.form.get("page_size", "A4")
+    page_size = request.form.get("page_size", "A4").upper()
+    orientation = request.form.get("orientation", "portrait").lower()
     password = request.form.get("pdf_password", "").strip()
 
     if not uploaded_files or uploaded_files[0].filename == '':
@@ -49,10 +49,8 @@ def convert():
     for file in uploaded_files:
         original_path = os.path.join(user_session_folder, file.filename)
         file.save(original_path)
-
-        clean_name = file.filename.rsplit('.', 1)[0] + "_fixed.jpg"
-        fixed_path = os.path.join(user_session_folder, clean_name)
-
+        
+        fixed_path = os.path.join(user_session_folder, f"proc_{file.filename}.jpg")
         try:
             with Image.open(original_path) as img:
                 rgb_img = img.convert('RGB')
@@ -61,34 +59,32 @@ def convert():
         except Exception:
             continue
 
-    output_pdf_path = os.path.join(user_session_folder, f"{custom_name}.pdf")
-
     sizes = {
         "A4": (img2pdf.mm_to_pt(210), img2pdf.mm_to_pt(297)),
         "LETTER": (img2pdf.mm_to_pt(216), img2pdf.mm_to_pt(279)),
         "A3": (img2pdf.mm_to_pt(297), img2pdf.mm_to_pt(420))
     }
 
-    selected_size = sizes.get(page_size.upper(), sizes["A4"])
-    layout_fun = img2pdf.get_layout_fun(pagesize=selected_size)
+    width, height = sizes.get(page_size, sizes["A4"])
+    if orientation == "landscape":
+        width, height = height, width
+
+    layout_fun = img2pdf.get_layout_fun(pagesize=(width, height))
+    output_pdf_path = os.path.join(user_session_folder, f"{custom_name}.pdf")
 
     with open(output_pdf_path, "wb") as f:
         f.write(img2pdf.convert(file_paths, layout_fun=layout_fun))
 
     if password:
-        encrypted_pdf_path = os.path.join(user_session_folder, f"locked_{custom_name}.pdf")
+        encrypted_path = os.path.join(user_session_folder, f"locked_{custom_name}.pdf")
         reader = PdfReader(output_pdf_path)
         writer = PdfWriter()
-
         for page in reader.pages:
             writer.add_page(page)
-
         writer.encrypt(password)
-
-        with open(encrypted_pdf_path, "wb") as f:
+        with open(encrypted_path, "wb") as f:
             writer.write(f)
-        
-        output_pdf_path = encrypted_pdf_path
+        output_pdf_path = encrypted_path
     
     return send_file(output_pdf_path, as_attachment=True, download_name=f"{custom_name}.pdf")
 

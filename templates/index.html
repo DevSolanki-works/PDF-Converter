@@ -206,34 +206,30 @@
         
         <form id="pdf-form">
             <div class="settings">
-                <div class="field-full">
-                    <label>Document Name</label>
-                    <input type="text" name="pdf_name" id="pdf_name" placeholder="e.g. Portfolio_Final">
-                </div>
-                <div>
-                    <label>Page Size</label>
-                    <select name="page_size">
-                        <option value="A4">A4 (Standard)</option>
-                        <option value="Letter">Letter (US)</option>
-                        <option value="A3">A3 (Large)</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Password (Optional)</label>
-                    <input type="password" name="pdf_password" placeholder="Keep it secret">
-                </div>
-            </div>
-
-            <div class="drop-zone" id="drop-zone">
-                <span id="drop-text" style="font-weight:600;">Click or Drag & Drop Images</span>
-                <input type="file" name="files" id="file-input" multiple accept="image/*" style="display: none;">
-                
-                <div id="preview-container" class="preview-grid"></div>
-            </div>
-            
-            <button type="submit">Forge PDF</button>
-        </form>
+    <div class="field-full">
+        <label>Document Name</label>
+        <input type="text" name="pdf_name" id="pdf_name" placeholder="e.g. Portfolio_Final">
     </div>
+    <div>
+        <label>Page Size</label>
+        <select name="page_size">
+            <option value="A4">A4 (Standard)</option>
+            <option value="Letter">Letter (US)</option>
+            <option value="A3">A3 (Large)</option>
+        </select>
+    </div>
+    <div>
+        <label>Orientation</label>
+        <select name="orientation">
+            <option value="portrait">Portrait</option>
+            <option value="landscape">Landscape</option>
+        </select>
+    </div>
+    <div class="field-full">
+        <label>Password (Optional)</label>
+        <input type="password" name="pdf_password" placeholder="Keep it secret">
+    </div>
+
     <script>
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
