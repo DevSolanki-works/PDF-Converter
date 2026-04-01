@@ -36,6 +36,7 @@ def convert():
     custom_name = request.form.get("pdf_name") or "my_pdf"
     page_size = request.form.get("page_size", "A4").upper()
     orientation = request.form.get("orientation", "portrait").lower()
+    compression = request.form.get("compression", "none").lower()
     password = request.form.get("pdf_password", "").strip()
 
     if not uploaded_files or uploaded_files[0].filename == '':
@@ -54,7 +55,18 @@ def convert():
         try:
             with Image.open(original_path) as img:
                 rgb_img = img.convert('RGB')
-                rgb_img.save(fixed_path, "JPEG", quality=95)
+                
+                # Apply compression settings
+                if compression == "medium":
+                    rgb_img.thumbnail((1920, 1920))
+                    qual = 70
+                elif compression == "high":
+                    rgb_img.thumbnail((1080, 1080))
+                    qual = 50
+                else:
+                    qual = 95 # None / Default
+                    
+                rgb_img.save(fixed_path, "JPEG", quality=qual, optimize=True)
                 file_paths.append(fixed_path)
         except Exception:
             continue
@@ -90,7 +102,3 @@ def convert():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-
