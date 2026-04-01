@@ -56,15 +56,14 @@ def convert():
             with Image.open(original_path) as img:
                 rgb_img = img.convert('RGB')
                 
-                # Apply compression settings
                 if compression == "medium":
                     rgb_img.thumbnail((1920, 1920))
-                    qual = 70
+                    qual = 75
                 elif compression == "high":
                     rgb_img.thumbnail((1080, 1080))
-                    qual = 50
+                    qual = 55
                 else:
-                    qual = 95 # None / Default
+                    qual = 100 
                     
                 rgb_img.save(fixed_path, "JPEG", quality=qual, optimize=True)
                 file_paths.append(fixed_path)
