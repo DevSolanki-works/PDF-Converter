@@ -5,7 +5,7 @@ import threading
 import time
 from flask import Flask, render_template, request, send_file
 import img2pdf
-from PIL import Image
+from PIL import Image, ImageChops
 from pypdf import PdfReader, PdfWriter
 
 app = Flask(__name__)
@@ -26,6 +26,16 @@ def cleanup_worker():
 
 threading.Thread(target=cleanup_worker, daemon=True).start()
 
+def trim_borders(img):
+    """Removes solid background borders from the image."""
+    bg = Image.new(img.mode, img.size, img.getpixel((0,0)))
+    diff = ImageChops.difference(img, bg)
+    diff = ImageChops.add(diff, diff, 2.0, -100)
+    bbox = diff.getbbox()
+    if bbox:
+        return img.crop(bbox)
+    return img
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -37,6 +47,7 @@ def convert():
     page_size = request.form.get("page_size", "A4").upper()
     orientation = request.form.get("orientation", "portrait").lower()
     compression = request.form.get("compression", "none").lower()
+    auto_crop = request.form.get("auto_crop", "no").lower()
     password = request.form.get("pdf_password", "").strip()
 
     if not uploaded_files or uploaded_files[0].filename == '':
@@ -56,14 +67,19 @@ def convert():
             with Image.open(original_path) as img:
                 rgb_img = img.convert('RGB')
                 
+                # Apply Auto Crop
+                if auto_crop == "yes":
+                    rgb_img = trim_borders(rgb_img)
+                
+                # Apply compression settings
                 if compression == "medium":
                     rgb_img.thumbnail((1920, 1920))
-                    qual = 75
+                    qual = 70
                 elif compression == "high":
                     rgb_img.thumbnail((1080, 1080))
-                    qual = 55
+                    qual = 50
                 else:
-                    qual = 100 
+                    qual = 95
                     
                 rgb_img.save(fixed_path, "JPEG", quality=qual, optimize=True)
                 file_paths.append(fixed_path)
@@ -101,3 +117,4 @@ def convert():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
