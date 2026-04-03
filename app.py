@@ -5,7 +5,7 @@ import threading
 import time
 from flask import Flask, render_template, request, send_file
 import img2pdf
-from PIL import Image, ImageChops
+from PIL import Image, ImageOps
 from pypdf import PdfReader, PdfWriter
 
 app = Flask(__name__)
@@ -26,16 +26,6 @@ def cleanup_worker():
 
 threading.Thread(target=cleanup_worker, daemon=True).start()
 
-def trim_borders(img):
-    """Removes solid background borders from the image."""
-    bg = Image.new(img.mode, img.size, img.getpixel((0,0)))
-    diff = ImageChops.difference(img, bg)
-    diff = ImageChops.add(diff, diff, 2.0, -100)
-    bbox = diff.getbbox()
-    if bbox:
-        return img.crop(bbox)
-    return img
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -47,7 +37,8 @@ def convert():
     page_size = request.form.get("page_size", "A4").upper()
     orientation = request.form.get("orientation", "portrait").lower()
     compression = request.form.get("compression", "none").lower()
-    auto_crop = request.form.get("auto_crop", "no").lower()
+    color_mode = request.form.get("color_mode", "color").lower()
+    margin = request.form.get("margin", "none").lower()
     password = request.form.get("pdf_password", "").strip()
 
     if not uploaded_files or uploaded_files[0].filename == '':
@@ -67,9 +58,14 @@ def convert():
             with Image.open(original_path) as img:
                 rgb_img = img.convert('RGB')
                 
-                # Apply Auto Crop
-                if auto_crop == "yes":
-                    rgb_img = trim_borders(rgb_img)
+                # Apply Grayscale Mode
+                if color_mode == "grayscale":
+                    rgb_img = rgb_img.convert('L').convert('RGB')
+                
+                # Apply Smart Margins (5% of max dimension)
+                if margin == "standard":
+                    border_size = int(max(rgb_img.size) * 0.05)
+                    rgb_img = ImageOps.expand(rgb_img, border=border_size, fill='white')
                 
                 # Apply compression settings
                 if compression == "medium":
@@ -83,7 +79,8 @@ def convert():
                     
                 rgb_img.save(fixed_path, "JPEG", quality=qual, optimize=True)
                 file_paths.append(fixed_path)
-        except Exception:
+        except Exception as e:
+            print(f"Error processing image: {e}")
             continue
 
     sizes = {
@@ -117,4 +114,3 @@ def convert():
 
 if __name__ == '__main__':
     app.run(debug=True)
-

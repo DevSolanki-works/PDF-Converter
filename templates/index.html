@@ -6,179 +6,74 @@
     <title>PDF Forge Pro | Image to PDF</title>
     <style>
         :root {
-            --bg: #121214;
-            --card: #1c1c21;
-            --text: #e4e4e7;
-            --primary: #c97a8e;
-            --accent: #a35b6e;
-            --border: #2f2f37;
+            --bg: #121214; --card: #1c1c21; --text: #e4e4e7;
+            --primary: #c97a8e; --accent: #a35b6e; --border: #2f2f37;
         }
 
         body { 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
+            background: var(--bg); color: var(--text); 
+            font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; 
         }
 
         .container { 
-            background: var(--card); 
-            padding: 2.5rem; 
-            border-radius: 1rem; 
-            width: 100%; 
-            max-width: 500px; 
-            border: 1px solid var(--border);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4); 
-            text-align: center;
-            position: relative; 
-            overflow: hidden;
+            background: var(--card); padding: 2.5rem; border-radius: 1rem; 
+            width: 100%; max-width: 500px; border: 1px solid var(--border);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4); text-align: center;
+            position: relative; overflow: hidden;
         }
 
-        h1 { 
-            color: var(--primary); 
-            margin-bottom: 0.5rem; 
-            font-size: 1.8rem; 
-            font-weight: 600;
-        }
-
-        p { 
-            opacity: 0.6; 
-            margin-bottom: 2rem; 
-            font-size: 0.9rem;
-        }
+        h1 { color: var(--primary); margin-bottom: 0.5rem; font-size: 1.8rem; font-weight: 600; }
+        p { opacity: 0.6; margin-bottom: 2rem; font-size: 0.9rem; }
 
         .settings { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 15px; 
-            text-align: left; 
-            margin-bottom: 20px; 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; 
+            text-align: left; margin-bottom: 20px; 
         }
 
         .field-full { grid-column: span 2; }
-
-        label { 
-            font-size: 0.75rem; 
-            font-weight: 600; 
-            text-transform: uppercase; 
-            color: var(--text); 
-            opacity: 0.8;
-            display: block; 
-            margin-bottom: 8px;
-        }
-
-        input, select { 
-            width: 100%; 
-            padding: 12px; 
-            border-radius: 6px; 
-            background: #121214; 
-            border: 1px solid var(--border); 
-            color: white; 
-            box-sizing: border-box; 
-            outline: none; 
-            transition: 0.2s; 
-        }
-
+        label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text); opacity: 0.8; display: block; margin-bottom: 8px;}
+        input, select { width: 100%; padding: 12px; border-radius: 6px; background: #121214; border: 1px solid var(--border); color: white; box-sizing: border-box; outline: none; transition: 0.2s; }
         input:focus, select:focus { border-color: var(--primary); }
 
         .drop-zone {
-            border: 2px dashed var(--border); 
-            padding: 20px; 
-            border-radius: 8px;
-            margin-bottom: 20px; 
-            transition: all 0.2s ease; 
-            cursor: pointer; 
+            border: 2px dashed var(--border); padding: 20px; border-radius: 8px;
+            margin-bottom: 20px; transition: all 0.2s ease; cursor: pointer; 
             background: rgba(201, 122, 142, 0.03);
         }
+        .drop-zone:hover { border-color: var(--primary); background: rgba(201, 122, 142, 0.08); }
 
-        .drop-zone:hover { 
-            border-color: var(--primary); 
-            background: rgba(201, 122, 142, 0.08); 
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        button { 
-            background: var(--primary); 
-            color: #121214; 
-            border: none; 
-            padding: 14px; 
-            border-radius: 6px; 
-            width: 100%; 
-            font-weight: 700; 
-            font-size: 1rem; 
-            cursor: pointer; 
-            transition: 0.2s; 
-        }
-
+        .action-buttons { display: flex; gap: 10px; margin-bottom: 15px; }
+        button { background: var(--primary); color: #121214; border: none; padding: 14px; border-radius: 6px; width: 100%; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.2s; }
         button:hover { background: var(--accent); }
-        
-        .btn-secondary {
-            background: var(--border);
-            color: var(--text);
-        }
-        
+        .btn-secondary { background: var(--border); color: var(--text); }
         .btn-secondary:hover { background: #3f3f4a; }
 
         .preview-grid {
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 10px; 
-            justify-content: center; 
-            margin-top: 15px;
-            max-height: 150px; 
-            overflow-y: auto; 
+            display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; 
+            margin-top: 15px; max-height: 150px; overflow-y: auto; 
         }
 
         .preview-grid img {
-            width: 60px; 
-            height: 60px; 
-            object-fit: cover; 
-            border-radius: 6px;
-            border: 1px solid var(--border); 
+            width: 60px; height: 60px; object-fit: cover; border-radius: 6px;
+            border: 2px solid var(--border); cursor: grab; transition: transform 0.2s;
         }
+        .preview-grid img:active { cursor: grabbing; transform: scale(1.1); }
+        .preview-grid img.drag-over { border-color: var(--primary); opacity: 0.5; }
 
-        /* Camera Modal Styles */
         #camera-modal {
-            position: fixed; 
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(18, 18, 20, 0.95); 
-            display: none; 
-            flex-direction: column;
-            justify-content: center; 
-            align-items: center; 
-            z-index: 100; 
-            backdrop-filter: blur(5px);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(18, 18, 20, 0.95); display: none; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(5px);
         }
-
-        #video-feed {
-            width: 90%;
-            max-width: 500px;
-            border-radius: 12px;
-            border: 2px solid var(--primary);
-            background: #000;
-        }
-
-        .camera-controls {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-            width: 90%;
-            max-width: 500px;
-        }
+        #video-feed { width: 90%; max-width: 500px; border-radius: 12px; border: 2px solid var(--primary); background: #000; }
+        .camera-controls { display: flex; gap: 15px; margin-top: 20px; width: 90%; max-width: 500px; }
 
         #loading-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(28, 28, 33, 0.95); display: none; 
-            flex-direction: column; justify-content: center; align-items: center; z-index: 10; 
+            background: rgba(28, 28, 33, 0.95); display: none; flex-direction: column; 
+            justify-content: center; align-items: center; z-index: 10; 
         }
     </style>
 </head>
@@ -187,7 +82,7 @@
     <div id="camera-modal">
         <video id="video-feed" autoplay playsinline></video>
         <div class="camera-controls">
-            <button type="button" id="snap-btn">📸 Capture Frame</button>
+            <button type="button" id="snap-btn">📸 Capture</button>
             <button type="button" id="close-camera" class="btn-secondary">Cancel</button>
         </div>
         <canvas id="camera-canvas" style="display: none;"></canvas>
@@ -199,7 +94,7 @@
         </div>
 
         <h1>PDF Forge</h1>
-        <p>Convert and Secure your Images</p>
+        <p>Convert, Reorder, and Secure your Images</p>
         
         <form id="pdf-form">
             <div class="settings">
@@ -222,6 +117,20 @@
                     </select>
                 </div>
                 <div>
+                    <label>Color Mode</label>
+                    <select name="color_mode">
+                        <option value="color">Full Color</option>
+                        <option value="grayscale">Grayscale (B&W)</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Image Margins</label>
+                    <select name="margin">
+                        <option value="none">No Margin</option>
+                        <option value="standard">Add White Border</option>
+                    </select>
+                </div>
+                <div>
                     <label>Compression</label>
                     <select name="compression">
                         <option value="none">None</option>
@@ -230,26 +139,20 @@
                     </select>
                 </div>
                 <div>
-                    <label>Auto Crop</label>
-                    <select name="auto_crop">
-                        <option value="no">Off</option>
-                        <option value="yes">Trim Borders</option>
-                    </select>
-                </div>
-                <div class="field-full">
                     <label>Password (Optional)</label>
-                    <input type="password" name="pdf_password" placeholder="Keep it secret">
+                    <input type="password" name="pdf_password" placeholder="Secret Key">
                 </div>
             </div>
 
             <div class="drop-zone" id="drop-zone">
                 <span id="drop-text" style="font-weight:600;">Click or Drag & Drop Images</span>
+                <p style="margin: 5px 0 0 0; font-size: 0.75rem; opacity: 0.7;">(Drag thumbnails below to reorder)</p>
                 <input type="file" name="files" id="file-input" multiple accept="image/*" style="display: none;">
                 <div id="preview-container" class="preview-grid"></div>
             </div>
 
             <div class="action-buttons">
-                <button type="button" id="start-camera" class="btn-secondary">📷 Live Camera</button>
+                <button type="button" id="start-camera" class="btn-secondary">📷 Camera</button>
                 <button type="submit">Forge PDF</button>
             </div>
         </form>
@@ -261,15 +164,16 @@
         const previewContainer = document.getElementById('preview-container');
         const form = document.getElementById('pdf-form');
         
-        // Camera Elements
         const cameraModal = document.getElementById('camera-modal');
         const videoFeed = document.getElementById('video-feed');
         const startCameraBtn = document.getElementById('start-camera');
         const snapBtn = document.getElementById('snap-btn');
         const closeCameraBtn = document.getElementById('close-camera');
         const cameraCanvas = document.getElementById('camera-canvas');
+        
         let stream = null;
         let currentFiles = [];
+        let draggedItemIndex = null;
 
         // File Selection Logic
         dropZone.onclick = (e) => { if(e.target.tagName !== 'IMG') fileInput.click(); };
@@ -284,16 +188,46 @@
             updatePreview();
         }
 
+        // Thumbnail UI & Drag-to-Reorder Logic
         function updatePreview() {
             previewContainer.innerHTML = ''; 
-            currentFiles.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    previewContainer.appendChild(img);
+            currentFiles.forEach((file, index) => {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.draggable = true;
+                
+                // Drag start
+                img.ondragstart = (e) => {
+                    draggedItemIndex = index;
+                    e.dataTransfer.effectAllowed = "move";
                 };
-                reader.readAsDataURL(file);
+                
+                // Drag over another image
+                img.ondragover = (e) => {
+                    e.preventDefault();
+                    img.classList.add('drag-over');
+                };
+                
+                // Drag leave
+                img.ondragleave = () => {
+                    img.classList.remove('drag-over');
+                };
+                
+                // Drop image to swap order
+                img.ondrop = (e) => {
+                    e.preventDefault();
+                    img.classList.remove('drag-over');
+                    
+                    const targetIndex = index;
+                    if (draggedItemIndex !== null && draggedItemIndex !== targetIndex) {
+                        const draggedFile = currentFiles[draggedItemIndex];
+                        currentFiles.splice(draggedItemIndex, 1); // remove from old spot
+                        currentFiles.splice(targetIndex, 0, draggedFile); // insert at new spot
+                        updatePreview(); // Re-render everything
+                    }
+                };
+
+                previewContainer.appendChild(img);
             });
         }
 
@@ -304,7 +238,7 @@
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                 videoFeed.srcObject = stream;
             } catch (err) {
-                alert("Camera access denied. Please check browser permissions.");
+                alert("Camera access denied.");
                 cameraModal.style.display = 'none';
             }
         };
@@ -323,7 +257,7 @@
             cameraCanvas.toBlob(blob => {
                 const file = new File([blob], `cam_${Date.now()}.jpg`, { type: 'image/jpeg' });
                 handleFiles([file]);
-                closeCameraBtn.click(); // Close after snap
+                closeCameraBtn.click();
             }, 'image/jpeg', 0.95);
         };
 
